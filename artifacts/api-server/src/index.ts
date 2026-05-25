@@ -16,6 +16,8 @@ import { execSync } from "child_process";
   }
 
   // Auto-run DB migration on startup in production
+  // import.meta.dirname = .../artifacts/api-server/dist/
+  // ../../../ = repo root
   if (process.env.NODE_ENV === "production" && process.env.DATABASE_URL) {
     try {
       logger.info("Running database migration...");
