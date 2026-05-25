@@ -2,6 +2,7 @@ import express, { type Express } from "express";
   import cors from "cors";
   import pinoHttp from "pino-http";
   import path from "path";
+  import { fileURLToPath } from "url";
   import { existsSync } from "fs";
   import router from "./routes";
   import { logger } from "./lib/logger";
@@ -33,14 +34,17 @@ import express, { type Express } from "express";
 
   app.use("/api", router);
 
-  // Serve the built React frontend in production
-  // import.meta.dirname = .../artifacts/api-server/dist/
-  // ../../cortex-ai/dist/public = .../artifacts/cortex-ai/dist/public
+  // Serve the built React frontend in production.
+  // After esbuild bundles to dist/index.mjs, import.meta.url points to that file.
+  // fileURLToPath(new URL(".", import.meta.url)) = .../artifacts/api-server/dist/
+  // ../../cortex-ai/dist/public             = .../artifacts/cortex-ai/dist/public
   if (process.env.NODE_ENV === "production") {
-    const staticDir = path.resolve(import.meta.dirname, "../../cortex-ai/dist/public");
+    const staticDir = path.resolve(
+      fileURLToPath(new URL(".", import.meta.url)),
+      "../../cortex-ai/dist/public",
+    );
     if (existsSync(staticDir)) {
       app.use(express.static(staticDir));
-      // SPA fallback — all non-API routes return index.html
       app.get("*", (_req, res) => {
         res.sendFile(path.join(staticDir, "index.html"));
       });
