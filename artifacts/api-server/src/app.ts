@@ -33,7 +33,8 @@ import express, { type Express } from "express";
     const staticDir = path.resolve(import.meta.dirname, "../../cortex-ai/dist/public");
     if (existsSync(staticDir)) {
       app.use(express.static(staticDir));
-      app.get("*", (_req, res) => {
+      // SPA fallback: Express 5 requires app.use() not app.get("*", ...)
+      app.use((_req, res) => {
         res.sendFile(path.join(staticDir, "index.html"));
       });
       logger.info({ staticDir }, "Serving frontend static files");
