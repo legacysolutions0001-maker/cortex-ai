@@ -1,23 +1,22 @@
 import { exec } from "child_process";
   import path from "path";
-  import { fileURLToPath } from "url";
   import app from "./app";
   import { logger } from "./lib/logger";
 
   const rawPort = process.env["PORT"];
-  if (!rawPort) throw new Error("PORT environment variable is required but was not provided.");
+  if (!rawPort) throw new Error("PORT is required");
   const port = Number(rawPort);
-  if (Number.isNaN(port) || port <= 0) throw new Error(`Invalid PORT value: "${rawPort}"`);
+  if (Number.isNaN(port) || port <= 0) throw new Error(`Invalid PORT: "${rawPort}"`);
 
-  app.listen(port, (err) => {
-    if (err) { logger.error({ err }, "Error listening on port"); process.exit(1); }
+  // Bind port immediately so Render health check passes, then migrate in background
+  app.listen(port, () => {
     logger.info({ port }, "Server listening");
 
     if (process.env.NODE_ENV === "production" && process.env.DATABASE_URL) {
-      const repoRoot = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "../../..");
-      logger.info({ repoRoot }, "Running database migration...");
-      exec("pnpm --filter @workspace/db run push", { cwd: repoRoot }, (error) => {
-        if (error) logger.error({ error }, "DB migration failed");
+      // import.meta.dirname = artifacts/api-server/dist/ → ../../.. = repo root
+      const repoRoot = path.resolve(import.meta.dirname, "../../..");
+      exec("pnpm --filter @workspace/db run push", { cwd: repoRoot }, (err) => {
+        if (err) logger.error({ err }, "DB migration failed — server still running");
         else logger.info("DB migration complete");
       });
     }
