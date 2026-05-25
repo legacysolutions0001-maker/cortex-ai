@@ -34,8 +34,10 @@ import express, { type Express } from "express";
   app.use("/api", router);
 
   // Serve the built React frontend in production
+  // import.meta.dirname = .../artifacts/api-server/dist/
+  // ../../cortex-ai/dist/public = .../artifacts/cortex-ai/dist/public
   if (process.env.NODE_ENV === "production") {
-    const staticDir = path.resolve(import.meta.dirname, "../cortex-ai/dist/public");
+    const staticDir = path.resolve(import.meta.dirname, "../../cortex-ai/dist/public");
     if (existsSync(staticDir)) {
       app.use(express.static(staticDir));
       // SPA fallback — all non-API routes return index.html
