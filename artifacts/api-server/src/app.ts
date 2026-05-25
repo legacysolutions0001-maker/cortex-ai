@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
   import cors from "cors";
   import pinoHttp from "pino-http";
   import path from "path";
@@ -33,7 +33,7 @@ import express, { type Express } from "express";
     const staticDir = path.resolve(import.meta.dirname, "../../cortex-ai/dist/public");
     if (existsSync(staticDir)) {
       app.use(express.static(staticDir));
-      // SPA fallback: Express 5 requires app.use() not app.get("*", ...)
+      // SPA fallback: app.use() — Express 5 does not accept app.get("*", ...)
       app.use((_req, res) => {
         res.sendFile(path.join(staticDir, "index.html"));
       });
@@ -42,6 +42,12 @@ import express, { type Express } from "express";
       logger.warn({ staticDir }, "Frontend static dir not found");
     }
   }
+
+  // JSON error handler — returns the actual error message so we can diagnose DB issues
+  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    logger.error({ err }, "Unhandled error");
+    res.status(500).json({ error: err.message ?? "Internal Server Error" });
+  });
 
   export default app;
   
