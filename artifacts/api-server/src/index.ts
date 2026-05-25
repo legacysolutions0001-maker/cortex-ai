@@ -1,6 +1,4 @@
-import { execSync } from "child_process";
-  import path from "path";
-  import app from "./app";
+import app from "./app";
   import { logger } from "./lib/logger";
 
   const rawPort = process.env["PORT"];
@@ -13,22 +11,6 @@ import { execSync } from "child_process";
 
   if (Number.isNaN(port) || port <= 0) {
     throw new Error(`Invalid PORT value: "${rawPort}"`);
-  }
-
-  // Auto-run DB migration on startup in production
-  // import.meta.dirname = .../artifacts/api-server/dist/
-  // ../../../ = repo root
-  if (process.env.NODE_ENV === "production" && process.env.DATABASE_URL) {
-    try {
-      logger.info("Running database migration...");
-      execSync("pnpm --filter @workspace/db run push", {
-        stdio: "inherit",
-        cwd: path.resolve(import.meta.dirname, "../../.."),
-      });
-      logger.info("Database migration complete");
-    } catch (err) {
-      logger.error({ err }, "Database migration failed — continuing anyway");
-    }
   }
 
   app.listen(port, (err) => {
