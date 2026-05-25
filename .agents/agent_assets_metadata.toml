@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "OuJNLZuZTIy7ET8Ack04T"
+uri = "file://cortex-ai.zip"
+type = "unspecified"
+title = "CORTEX AI — Digital Brain OS X (Full Project)"
