@@ -35,9 +35,9 @@ import express, { type Express } from "express";
   app.use("/api", router);
 
   // Serve the built React frontend in production.
-  // After esbuild bundles to dist/index.mjs, import.meta.url points to that file.
-  // fileURLToPath(new URL(".", import.meta.url)) = .../artifacts/api-server/dist/
-  // ../../cortex-ai/dist/public             = .../artifacts/cortex-ai/dist/public
+  // The ESM bundle lives at artifacts/api-server/dist/index.mjs.
+  // fileURLToPath(new URL(".", import.meta.url)) resolves to that dist/ directory.
+  // Going up ../../cortex-ai/dist/public reaches artifacts/cortex-ai/dist/public.
   if (process.env.NODE_ENV === "production") {
     const staticDir = path.resolve(
       fileURLToPath(new URL(".", import.meta.url)),
