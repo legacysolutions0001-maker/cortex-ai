@@ -10,6 +10,7 @@ services:
       NODE_ENV=production PORT=3000 BASE_PATH=/ pnpm --filter @workspace/cortex-ai run build &&
       pnpm --filter @workspace/api-server run build
     startCommand: NODE_ENV=production pnpm --filter @workspace/api-server run start
+    preDeployCommand: pnpm --filter @workspace/db run push
     envVars:
       - key: NODE_ENV
         value: production
